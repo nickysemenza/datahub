@@ -42,16 +42,21 @@ public function getFBThreads()
         $url=$decoded['paging']['next'];
     }
 }
-public function getFBMessagesFromThread($threadID)
+public function getFBMessagesFromThread($thread_id)
 {
-    $data=$threadID;
+    $data=$thread_id;
     $token='CAAKfmL5GXZBgBAEmLXoyPIYnYXuGx3iWbfojWv6bHlMsX0j46qDjKZCJKPTBIFy5g5aIQy8HnVuaxJ0GE8aRn192bZB79g2NFd2VxwgBMFXTSMGsjxWqtc6gMuPJoDJl89OylFpQUlMRLXlUorKP79dZCeRDLUDqHFiLwoDaoj5LZAMzOOOKr5cHfHweWQ3kZD';
-    $url="https://graph.facebook.com/".$threadID."?access_token=".$token;
+    $url="https://graph.facebook.com/".$thread_id."?access_token=".$token;
     //will get $x<(cap * 25)
-    $cap=1900;
+    $cap=1000;
+    $threadLookup=Threads::find($thread_id);
+    if($threadLookup!=null)
+    {
+        $cap=($threadLookup->message_count+30)/25;
+    }
     for($x=0;$x<$cap;$x++)
     {
-        error_log("processing ".($x*25)." to ".(($x+1)*25)." of ".($cap-1)*25);
+        error_log("processing ".($x*25)." to ".(($x+1)*25)." of ".(($cap-1)*25)." (".(100*($x*25))/(($cap-1)*25)."%)");
         $decoded=json_decode(file_get_contents($url), true);
         Clockwork::info($decoded);
         if($x==0)
@@ -68,7 +73,7 @@ public function getFBMessagesFromThread($threadID)
             'from_name'=>$eachMessage['from']['name'],
             'time'=>$eachMessage['created_time'],
             'message'=>$eachMessage['message'],
-            'thread_id'=>$threadID);
+            'thread_id'=>$thread_id);
             $test=Messages::firstOrCreate($info);
         }
         $url=$allmsg['paging']['next'];
@@ -96,5 +101,26 @@ public function getFBMessagesFromThread($threadID)
         //$this->extendToken('CAAKfmL5GXZBgBAMunZB7XLhJEA22xbu7ittBhgZAgjaTsQvY6ZArncgBdj6AJjB93JuKek2jkrsULKtyaYYlhyzILKFDSZCop323h5ZC1O7DTisbpKiMkFoe19ZCz5h9mZB3ev6oacrE8yxfxeuZAKhPI9AVYs6lzwXCpPWNaKYEWSE8akI4ze3ZA54vGTmMrsHRHfqmPXVHg1MRRRioMXuDoz');
         $data='yo';
         return View::make('test',compact('data'));
+    }
+    public function showThreads()
+    {
+        $threadsArray=array();
+        $threads = Threads::all();
+        foreach($threads as $eachThread)
+        {
+            array_push($threadsArray,array('message_count'=>$eachThread['message_count'],'thread_id'=>$eachThread['thread_id'],'people'=>$eachThread['participants_names']));
+        }
+        $data['threads']=$threadsArray;
+
+        return View::make('threads',compact('data'));
+    }
+    public  function getThread($thread_id,$limit=50)
+    {
+
+        $messagesArray=array();
+        $messagesArray = Messages::where('thread_id', '=', $thread_id)->take($limit)->get();
+        $data['messages']=$messagesArray;
+        $data['thread_id']=$thread_id;
+        return View::make('thread',compact('data'));
     }
 }
