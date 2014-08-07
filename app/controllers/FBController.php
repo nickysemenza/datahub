@@ -45,11 +45,13 @@ public function getFBThreads()
 public function getFBMessagesFromThread($threadID)
 {
     $data=$threadID;
-    $token='CAAKfmL5GXZBgBADCiSlBf5LM9ZC4GcbDFFazfbSoXTkNAZBdAteuNkDZBzueGQFa3618CRhnKVlBndR6JPx9wOv2KGoLBt8y0bbEFyEF6Ez8akkXPtwGhwcuhNa8AzRIlZCGDcL9440RBNnRAClWd0ECCM1NuvmCEoCzLKdZClxUZCUK1vtZAUfS6eIZBZBLf6RFpZBIl8wZBbnQKl2rvjBZAs6Ur';
+    $token='CAAKfmL5GXZBgBAEmLXoyPIYnYXuGx3iWbfojWv6bHlMsX0j46qDjKZCJKPTBIFy5g5aIQy8HnVuaxJ0GE8aRn192bZB79g2NFd2VxwgBMFXTSMGsjxWqtc6gMuPJoDJl89OylFpQUlMRLXlUorKP79dZCeRDLUDqHFiLwoDaoj5LZAMzOOOKr5cHfHweWQ3kZD';
     $url="https://graph.facebook.com/".$threadID."?access_token=".$token;
     //will get $x<(cap * 25)
-    for($x=0;$x<10;$x++)
+    $cap=1900;
+    for($x=0;$x<$cap;$x++)
     {
+        error_log("processing ".($x*25)." to ".(($x+1)*25)." of ".($cap-1)*25);
         $decoded=json_decode(file_get_contents($url), true);
         Clockwork::info($decoded);
         if($x==0)
@@ -72,13 +74,26 @@ public function getFBMessagesFromThread($threadID)
         $url=$allmsg['paging']['next'];
         var_dump($url);
     }
-
-
     return View::make('test',compact('data'));
 }
-
+    public function extendToken($token)
+    {
+        $session = new FacebookSession($token);
+        $extendedToken = (new FacebookRequest(
+            $session, 'GET', '/oauth/access_token',array(
+                'grant_type'=>'fb_exchange_token',
+                'client_id'=> Config::get('keys.fb_appid'),
+                'client_secret'=>Config::get('keys.fb_secret'),
+                'fb_exchange_token'=>$session->getToken()
+            )
+        ))->execute()->getGraphObject(GraphUser::className());
+        $token=$extendedToken->getProperty('access_token');
+        Clockwork::info(array("token"=>$token));
+        var_dump($token);
+    }
     public function fbtest()
     {
+        //$this->extendToken('CAAKfmL5GXZBgBAMunZB7XLhJEA22xbu7ittBhgZAgjaTsQvY6ZArncgBdj6AJjB93JuKek2jkrsULKtyaYYlhyzILKFDSZCop323h5ZC1O7DTisbpKiMkFoe19ZCz5h9mZB3ev6oacrE8yxfxeuZAKhPI9AVYs6lzwXCpPWNaKYEWSE8akI4ze3ZA54vGTmMrsHRHfqmPXVHg1MRRRioMXuDoz');
         $data='yo';
         return View::make('test',compact('data'));
     }

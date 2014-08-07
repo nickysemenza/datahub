@@ -4,5 +4,4 @@
 Users!
 
 {{var_dump($data)}}
-
 @stop

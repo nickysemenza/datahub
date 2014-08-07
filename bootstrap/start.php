@@ -23,7 +23,8 @@ $app = new Illuminate\Foundation\Application;
 | given environment, then we will automatically detect it for you.
 |
 */
-
+ini_set('max_execution_time', 300);
+ini_set('memory_limit','1024M');
 $env = $app->detectEnvironment(array(
 
 	'local' => array('homestead'),
