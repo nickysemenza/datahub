@@ -32,18 +32,17 @@
 @stop
 
 
-<label><input type="checkbox"> Sort values</label>
+<div class="chart">
+</div>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 
-    var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    var margin = {top: 20, right: 20, bottom: 150, left: 40},
         width = 1560 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
-    var formatPercent = d3.format(".0%");
-
     var x = d3.scale.ordinal()
-        .rangeRoundBands([0, width], .1, 1);
+        .rangeRoundBands([0, width], .1,.5);
 
     var y = d3.scale.linear()
         .range([height, 0]);
@@ -55,15 +54,14 @@
     var yAxis = d3.svg.axis()
         .scale(y)
         .orient("left")
-        .tickFormat(formatPercent);
 
-    var svg = d3.select("body").append("svg")
+    var svg = d3.select(".chart").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    d3.json("/fb/json/threads", function(error, data) {
+        d3.json("/fb/json/threads", function(error, data) {
 
         data.forEach(function(d) {
             d.message_count = +d.message_count;
@@ -75,7 +73,15 @@
         svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
-            .call(xAxis);
+            .call(xAxis)
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", function(d) {
+                return "rotate(-60)"
+            });
+
 
         svg.append("g")
             .attr("class", "y axis")
@@ -96,34 +102,6 @@
             .attr("y", function(d) { return y(d.message_count); })
             .attr("height", function(d) { return height - y(d.message_count); });
 
-        d3.select("input").on("change", change);
-
-        var sortTimeout = setTimeout(function() {
-            d3.select("input").property("checked", true).each(change);
-        }, 2000);
-
-        function change() {
-            clearTimeout(sortTimeout);
-
-            // Copy-on-write since tweens are evaluated after a delay.
-            var x0 = x.domain(data.sort(this.checked
-                        ? function(a, b) { return b.message_count - a.message_count; }
-                        : function(a, b) { return d3.ascending(a.people, b.people); })
-                    .map(function(d) { return d.people; }))
-                .copy();
-
-            var transition = svg.transition().duration(750),
-                delay = function(d, i) { return i * 50; };
-
-            transition.selectAll(".bar")
-                .delay(delay)
-                .attr("x", function(d) { return x0(d.people); });
-
-            transition.select(".x.axis")
-                .call(xAxis)
-                .selectAll("g")
-                .delay(delay);
-        }
     });
 
 </script>

@@ -132,7 +132,8 @@ public function getFBMessagesFromThread($thread_id)
     public function showThreadsJSON()
     {
         $threadsArray=array();
-        $threads = Threads::all()->take(10);
+        //$threads = Threads::all()->-take(10);
+        $threads=Threads::orderBy('message_count', 'DESC')->take(10)->get();
         foreach($threads as $eachThread)
         {
             array_push($threadsArray,array('message_count'=>$eachThread['message_count'],'thread_id'=>$eachThread['thread_id'],'people'=>$eachThread['participants_names']));

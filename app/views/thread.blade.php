@@ -52,16 +52,21 @@
         //ajax call
         function get_words() {
             //make ajax call
+            var t1 = new Date();
             d3.json("/fb/json/thread_wordcloud/{{$data['thread_id']}}/", function(error,json) {
                 if (error) return console.warn(error);
                 var words_array = [];
                 for (key in json){
                     words_array.push({text: key, size: json[key]})
                 }
-                console.log(json);
-
+                var t2 = new Date();
                 //render cloud
                 mycloud.stop().words(words_array).start();
+                var t3 = new Date();
+                console.log("init to all data read:"+(t2-t1)+"ms");
+                console.log("data read to rendered:"+(t3-t2)+"ms");
+                console.log("total runtime:"+(t3-t1)+"ms");
+
             });
         };
 
@@ -80,7 +85,7 @@
 
 
 <h3>{{$data['thread_id']}}</h3>
-<table class="table table-striped table-bordered sortable hidden ">
+<table class="table table-striped table-bordered sortable ">
     <thead>
     <tr>
         <th>name</th>
