@@ -42,6 +42,40 @@ public function getFBThreads()
         $url=$decoded['paging']['next'];
     }
 }
+public function getFBMessagesFromThread($threadID)
+{
+    $data=$threadID;
+    $token='CAAKfmL5GXZBgBADCiSlBf5LM9ZC4GcbDFFazfbSoXTkNAZBdAteuNkDZBzueGQFa3618CRhnKVlBndR6JPx9wOv2KGoLBt8y0bbEFyEF6Ez8akkXPtwGhwcuhNa8AzRIlZCGDcL9440RBNnRAClWd0ECCM1NuvmCEoCzLKdZClxUZCUK1vtZAUfS6eIZBZBLf6RFpZBIl8wZBbnQKl2rvjBZAs6Ur';
+    $url="https://graph.facebook.com/".$threadID."?access_token=".$token;
+    //will get $x<(cap * 25)
+    for($x=0;$x<10;$x++)
+    {
+        $decoded=json_decode(file_get_contents($url), true);
+        Clockwork::info($decoded);
+        if($x==0)
+        {
+            $allmsg=$decoded['messages'];
+        }
+        else
+        {
+            $allmsg=$decoded;
+        }
+        foreach($allmsg['data'] as $eachMessage)
+        {
+            $info=Array('from_id'=>$eachMessage['from']['id'],
+            'from_name'=>$eachMessage['from']['name'],
+            'time'=>$eachMessage['created_time'],
+            'message'=>$eachMessage['message'],
+            'thread_id'=>$threadID);
+            $test=Messages::firstOrCreate($info);
+        }
+        $url=$allmsg['paging']['next'];
+        var_dump($url);
+    }
+
+
+    return View::make('test',compact('data'));
+}
 
     public function fbtest()
     {

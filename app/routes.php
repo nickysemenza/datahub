@@ -18,3 +18,4 @@ Route::get('/', array('as' => 'home', function() {
 }));
 
 Route::get('/fbtest','FBController@fbtest');
+Route::get('/thread/{threadID}','FBController@getFBMessagesFromThread');
