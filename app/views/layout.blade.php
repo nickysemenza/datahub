@@ -5,15 +5,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="token" content="{{ Session::token() }}">
-    <title>title</title>
+    <title>@section('title')@show</title>
     @section('css')
     {{ HTML::style('css/bootstrap.min.css'); }}
+    {{ HTML::style('css/bootstrap-sortable.css'); }}
     {{ HTML::style('//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css'); }}
     @show
 
     @section('js')
     {{ HTML::script('//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js'); }}
     {{ HTML::script('js/bootstrap.min.js'); }}
+    {{ HTML::script('js/bootstrap-sortable.js'); }}
+    {{ HTML::script('js/moment.min.js'); }}
+
     @show
 </head>
 <body>
@@ -21,12 +25,8 @@
 
 @include('nav')
 <div class="container" style="margin-top:20px;">
-    <div class="row">
-        <div class="col-md-12">
-            <h1 id="heading"> @section('append_header')@show</h1>
-            @yield('content')
-        </div>
-    </div>
+    <h1 id="heading"> @section('append_header')@show</h1>
+    @yield('content')
 </div>
 @section('bottom_js')
 @show

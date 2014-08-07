@@ -3,7 +3,7 @@
 @section('content')
 
 
-<table class="table table-striped table-bordered">
+<table class="table table-striped table-bordered sortable">
     <thead>
     <tr>
         <th>message_count</th>
