@@ -123,4 +123,14 @@ public function getFBMessagesFromThread($thread_id)
         $data['thread_id']=$thread_id;
         return View::make('thread',compact('data'));
     }
+    public function showThreadsJSON()
+    {
+        $threadsArray=array();
+        $threads = Threads::all()->take(10);
+        foreach($threads as $eachThread)
+        {
+            array_push($threadsArray,array('message_count'=>$eachThread['message_count'],'thread_id'=>$eachThread['thread_id'],'people'=>$eachThread['participants_names']));
+        }
+        echo(json_encode($threadsArray));
+    }
 }

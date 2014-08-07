@@ -17,15 +17,17 @@
     {{ HTML::script('js/bootstrap.min.js'); }}
     {{ HTML::script('js/bootstrap-sortable.js'); }}
     {{ HTML::script('js/moment.min.js'); }}
-
     @show
+
+    @section('append_header')@show
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
 </head>
 <body>
-{{ HTML::script('js/tracking.js'); }}
 
 @include('nav')
 <div class="container" style="margin-top:20px;">
-    <h1 id="heading"> @section('append_header')@show</h1>
+    <h1 id="heading">@section('append_heading')@show</h1>
     @yield('content')
 </div>
 @section('bottom_js')

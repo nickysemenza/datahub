@@ -22,7 +22,7 @@
     </tbody>
 </table>
 
-@section('append_header')
+@section('append_heading')
 @parent
 Thread view - {{$data['thread_id']}}
 @stop

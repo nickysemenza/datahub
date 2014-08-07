@@ -22,3 +22,6 @@ Route::get('/thread/{thread_id}','FBController@getFBMessagesFromThread');
 Route::get('/fb/threads','FBController@showThreads');
 Route::get('/fb/thread/{thread_id}/{limit?}','FBController@getThread');
 Route::get('/fb/update_thread/{thread_id}/','FBController@getFBMessagesFromThread');
+
+
+Route::get('/fb/json/threads','FBController@showThreadsJSON');
