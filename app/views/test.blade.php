@@ -2,5 +2,7 @@
 
 @section('content')
 Users!
-{{var_dump($data['fb'])}}
+
+{{var_dump($data)}}
+
 @stop
