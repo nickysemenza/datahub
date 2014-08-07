@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="token" content="{{ Session::token() }}">
+    <meta content="utf-8" http-equiv="encoding">
     <title>@section('title')@show</title>
     @section('css')
     {{ HTML::style('css/bootstrap.min.css'); }}
@@ -13,6 +14,7 @@
     @show
 
     @section('js')
+
     {{ HTML::script('//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js'); }}
     {{ HTML::script('js/bootstrap.min.js'); }}
     {{ HTML::script('js/bootstrap-sortable.js'); }}
@@ -20,8 +22,6 @@
     @show
 
     @section('append_header')@show
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-
 </head>
 <body>
 

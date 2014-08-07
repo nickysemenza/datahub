@@ -25,3 +25,7 @@ Route::get('/fb/update_thread/{thread_id}/','FBController@getFBMessagesFromThrea
 
 
 Route::get('/fb/json/threads','FBController@showThreadsJSON');
+Route::get('/fb/json/thread_wordcloud/{thread_id}','FBController@getThreadWordCloudJSON');
+
+
+

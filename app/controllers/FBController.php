@@ -121,6 +121,12 @@ public function getFBMessagesFromThread($thread_id)
         $messagesArray = Messages::where('thread_id', '=', $thread_id)->take($limit)->get();
         $data['messages']=$messagesArray;
         $data['thread_id']=$thread_id;
+
+        $threadLookup=Threads::find($thread_id);
+        if($threadLookup!=null)
+        {
+            $data['names']=$threadLookup->participants_names;
+        }
         return View::make('thread',compact('data'));
     }
     public function showThreadsJSON()
@@ -132,5 +138,18 @@ public function getFBMessagesFromThread($thread_id)
             array_push($threadsArray,array('message_count'=>$eachThread['message_count'],'thread_id'=>$eachThread['thread_id'],'people'=>$eachThread['participants_names']));
         }
         echo(json_encode($threadsArray));
+    }
+    public function getThreadWordCloudJSON($thread_id)
+    {
+        $messagesArray=array();
+        $messages = Messages::where('thread_id', '=', $thread_id)->take(4000)->get();
+        foreach($messages as $eachMessage)
+        {
+            $msgs=explode(" ", $eachMessage['message']);
+            $messagesArray=array_merge($messagesArray,$msgs);
+        }
+        $result = array_count_values($messagesArray);
+        arsort($result);
+        echo json_encode($result);
     }
 }
