@@ -2,7 +2,6 @@
 
 @section('content')
 
-<div id="chart_div" style="width: 2000px; height: 800px;"></div>
 </body>
 
 @section('append_heading')
@@ -10,8 +9,9 @@
 Chartz yo
 @stop
 
-@section('append_header')
+@section('bottom_js')
 @parent
+<div id="chart_div" style="width: 1800px; height: 900px;"></div>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript">
     google.load("visualization", "1", {packages:["corechart"]});
@@ -21,6 +21,7 @@ Chartz yo
 
         var options = {
             //curveType: 'function',
+            lineWidth: 4,
             title: '{{$data['chartname']}}'
         };
 

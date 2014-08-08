@@ -128,13 +128,22 @@ public function getFBMessagesFromThread($thread_id)
         }
         return View::make('thread',compact('data'));
     }
-    public function getSpecialThread($thread_id,$query="")
+    public function getSpecialThread($thread_id,$query="",$dateFormat="Y-z")
     {
-        $messages = Messages::where('thread_id', '=', $thread_id)->where('message','like','%'.$query.'%')->get();
+        if($query=="all")
+        {
+            $query="";
+        }
+        if($thread_id=="all")
+        {
+            $thread_id="";
+        }
+
+        date_default_timezone_set('America/Los_Angeles');
+        $messages = Messages::where('thread_id', 'like', '%'.$thread_id.'%')->where('message','like','%'.$query.'%')->get();
         $frequencies=array();
         $dates=array();
         $names=array();
-        $dateFormat="Y-z";
         foreach($messages as $each)
         {
             $formattedDate=date($dateFormat, strtotime($each->time));
