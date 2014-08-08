@@ -20,12 +20,13 @@ Route::get('/', array('as' => 'home', function() {
 Route::get('/fbtest','FBController@fbtest');
 Route::get('/thread/{thread_id}','FBController@getFBMessagesFromThread');
 Route::get('/fb/threads','FBController@showThreads');
-Route::get('/fb/thread/{thread_id}/{limit?}','FBController@getThread');
+Route::get('/fb/thread/view/{thread_id}/{limit?}','FBController@getThread');
 Route::get('/fb/update_thread/{thread_id}/','FBController@getFBMessagesFromThread');
 
 
 Route::get('/fb/json/threads','FBController@showThreadsJSON');
 Route::get('/fb/json/thread_wordcloud/{thread_id}','FBController@getThreadWordCloudJSON');
 
+Route::get('/fb/thread/special/{thread_id}/{query?}','FBController@getSpecialThread');
 
 

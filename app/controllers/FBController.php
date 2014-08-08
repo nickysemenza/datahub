@@ -116,8 +116,7 @@ public function getFBMessagesFromThread($thread_id)
     }
     public  function getThread($thread_id,$limit=50)
     {
-
-        $messagesArray=array();
+        date_default_timezone_set("America/Los_Angeles");
         $messagesArray = Messages::where('thread_id', '=', $thread_id)->take($limit)->get();
         $data['messages']=$messagesArray;
         $data['thread_id']=$thread_id;
@@ -129,11 +128,91 @@ public function getFBMessagesFromThread($thread_id)
         }
         return View::make('thread',compact('data'));
     }
+    public function getSpecialThread($thread_id,$query="")
+    {
+        $messages = Messages::where('thread_id', '=', $thread_id)->where('message','like','%'.$query.'%')->get();
+        $frequencies=array();
+        $dates=array();
+        $names=array();
+        $dateFormat="Y-z";
+        foreach($messages as $each)
+        {
+            $formattedDate=date($dateFormat, strtotime($each->time));
+            if(!in_array($formattedDate,$dates))
+            {
+                array_push($dates,$formattedDate);
+            }
+            if(!in_array($each->from_name,$names))
+            {
+                array_push($names,$each->from_name);
+            }
+
+            if(isset($frequencies[$each->from_name][$formattedDate]))
+            {
+                $frequencies[$each->from_name][$formattedDate]++;
+            }
+            else
+            {
+                $frequencies[$each->from_name][$formattedDate]=1;
+            }
+        }
+
+        sort($names);
+        $headers=$names;
+        array_unshift($headers,'dates');
+        $chartData=array($headers);
+        sort($dates);
+
+        foreach($dates as $eachDay)
+        {
+            $temp=array($eachDay);
+            foreach($names as $eachName)
+            {
+                if(isset($frequencies[$eachName][$eachDay]))
+                {
+                    array_push($temp,$frequencies[$eachName][$eachDay]);
+                }
+                else
+                {
+                    array_push($temp,0);
+                }
+            }
+            array_push($chartData,$temp);
+        }
+        $data['chartdata']=json_encode($chartData);
+        $data['chartname']='plotting occurance of ['.$query.'] vs time';
+        $data['thread_id']=$thread_id;
+        return View::make('gchart',compact('data'));
+
+//        $sortbyname=array(array('day','meggin','nicky'));
+//        foreach($frequencies as $person_name =>$value1)
+//        {
+//            echo($person_name);
+//            foreach($value1 as $day_name=>$count)
+//            {
+//                echo "Name: $person_name; Day: $day_name; Count: $count<br>";
+//                array_push($sortbyname,array($day_name,$person_name,$count));
+//            }
+//        }
+
+//        $result = array_count_values($messagesArray);
+//        ksort($result);
+//        $test=array(array('herp','derp'));
+//        foreach ($result as $key => $value) {
+//            echo "Key: $key; Value: $value<br />\n";
+//            array_push($test,array($key,$value));
+//        }
+//        echo "<pre>".var_dump($frequencies)."</pre>";
+
+
+
+    }
+
     public function showThreadsJSON()
     {
         $threadsArray=array();
         //$threads = Threads::all()->-take(10);
-        $threads=Threads::orderBy('message_count', 'DESC')->take(10)->get();
+        $threads=Threads::orderBy('message_count', 'DESC')->take(20)->get();
         foreach($threads as $eachThread)
         {
             array_push($threadsArray,array('message_count'=>$eachThread['message_count'],'thread_id'=>$eachThread['thread_id'],'people'=>$eachThread['participants_names']));

@@ -37,7 +37,7 @@
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 
-    var margin = {top: 20, right: 20, bottom: 150, left: 40},
+    var margin = {top: 20, right: 20, bottom: 300, left: 40},
         width = 1560 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
@@ -79,7 +79,7 @@
             .attr("dx", "-.8em")
             .attr("dy", ".15em")
             .attr("transform", function(d) {
-                return "rotate(-60)"
+                return "rotate(-80)"
             });
 
 

@@ -65,7 +65,7 @@
                 var t3 = new Date();
                 console.log("init to all data read:"+(t2-t1)+"ms");
                 console.log("data read to rendered:"+(t3-t2)+"ms");
-                console.log("total runtime:"+(t3-t1)+"ms");
+                console.log("total runtime:"+(t3-t)+"ms");
 
             });
         };
@@ -98,7 +98,7 @@
     <tr>
         <td>{{$message->from_name}}</td>
         <td>{{$message->message}}</td>
-        <td>{{$message->time}}</td>
+        <td>{{date("D M jS, h:i:s A", strtotime($message->time))}}</td>
     </tr>
     @endforeach
     </tbody>
