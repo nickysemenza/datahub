@@ -7,13 +7,7 @@ use Facebook\FacebookRequestException;
 use Facebook\FacebookJavaScriptLoginHelper;
 FacebookSession::setDefaultApplication(Config::get('keys.fb_appid'), Config::get('keys.fb_secret'));
 
-class FBController extends BaseController {
-//    $session = new FacebookSession($token);
-//    $request = new FacebookRequest($session, 'GET', '/me');
-//    $response = $request->execute();
-//    $graphObject = $response->getGraphObject();
-//    Clockwork::info($graphObject);
-//    $data['fb']=$graphObject;
+class FBChatController extends BaseController {
 public function getFBThreads()
 {
     $token=Config::get('keys.fb_secret');

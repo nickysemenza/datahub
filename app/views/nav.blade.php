@@ -13,11 +13,11 @@
         <div class="collapse navbar-collapse" id="nav-collapse">
             <ul class="nav navbar-nav">
                 <li><a href="#">Action</a></li>
-                <li>{{ HTML::linkAction('FBController@showThreads', 'Threads') }}</li>
+                <li>{{ HTML::linkAction('FBChatController@showThreads', 'Threads') }}</li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">FB<b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li>{{ HTML::linkAction('FBController@showThreads', 'Threads') }}</li>
+                        <li>{{ HTML::linkAction('FBChatController@showThreads', 'Threads') }}</li>
                     </ul>
                 </li>
             </ul>

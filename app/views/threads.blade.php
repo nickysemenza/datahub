@@ -117,7 +117,7 @@
     @foreach($data['threads'] as $thread)
     <tr>
         <td>{{$thread['message_count']}}</td>
-        <td><a href="{{action('FBController@getThread', array('thread_id' => $thread['thread_id']))}}">{{$thread['people']}}</a></td>
+        <td><a href="{{action('FBChatController@getThread', array('thread_id' => $thread['thread_id']))}}">{{$thread['people']}}</a></td>
     </tr>
     @endforeach
     </tbody>
