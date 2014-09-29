@@ -16,7 +16,7 @@ class FBController extends BaseController {
 //    $data['fb']=$graphObject;
 public function getFBThreads()
 {
-    $token='CAAKfmL5GXZBgBANqSxZBDmZCzJHEqZBzz43gCcqXb40bjDmFaBH9pQ5c4dvFbzzbuRSo2qB3Df58ShZBIsYhrk9sKWHUr9VsdIDj5BhK9O5DWgzQgwZCSl2IkcvCYlenZBRiZCxE9kjHLKosNmKgXZAShrEhZAor7Q7mrx0YqntIRdtLtpjRoCf0m0KyjiSiyoTK5LeqFDrALqeqdQgGf0I0ZBZB';
+    $token=Config::get('keys.fb_secret');
     $data=0;
     $url="https://graph.facebook.com/me/threads?access_token=".$token;
     for($x=0;$x<30;$x++)
@@ -26,6 +26,8 @@ public function getFBThreads()
         {
             $participants_ids=array();
             $participants_names=array();
+            $this->er($eachThread);
+
             foreach($eachThread['participants']['data'] as $participants)
             {
                 array_push($participants_ids,$participants['id']);
@@ -45,7 +47,7 @@ public function getFBThreads()
 public function getFBMessagesFromThread($thread_id)
 {
     $data=$thread_id;
-    $token='CAAKfmL5GXZBgBAEmLXoyPIYnYXuGx3iWbfojWv6bHlMsX0j46qDjKZCJKPTBIFy5g5aIQy8HnVuaxJ0GE8aRn192bZB79g2NFd2VxwgBMFXTSMGsjxWqtc6gMuPJoDJl89OylFpQUlMRLXlUorKP79dZCeRDLUDqHFiLwoDaoj5LZAMzOOOKr5cHfHweWQ3kZD';
+    $token=Config::get('keys.fb_secret');
     $url="https://graph.facebook.com/".$thread_id."?access_token=".$token;
     //will get $x<(cap * 25)
     $cap=1000;
@@ -105,7 +107,7 @@ public function getFBMessagesFromThread($thread_id)
     public function showThreads()
     {
         $threadsArray=array();
-        $threads = Threads::all();
+        $threads = Threads::orderBy('message_count','DESC')->get();
         foreach($threads as $eachThread)
         {
             array_push($threadsArray,array('message_count'=>$eachThread['message_count'],'thread_id'=>$eachThread['thread_id'],'people'=>$eachThread['participants_names']));
@@ -240,5 +242,22 @@ public function getFBMessagesFromThread($thread_id)
         $result = array_count_values($messagesArray);
         arsort($result);
         echo json_encode($result);
+    }
+    public function getSSLPage($url) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_SSLVERSION,3);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        return $result;
+    }
+    public function er($data)
+    {
+        ob_start();
+        print_r($data);
+        $contents = ob_get_contents();
+        ob_end_clean();
+        error_log($contents);
     }
 }

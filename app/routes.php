@@ -16,7 +16,9 @@ Route::get('/welcome','HomeController@showWelcome');
 Route::get('/', array('as' => 'home', function() {
     return View::make('test');
 }));
+Route::get('/fb/','FBController@showThreads');
 
+Route::get('/fb/getThreads','FBController@getFBThreads');
 Route::get('/fbtest','FBController@fbtest');
 Route::get('/thread/{thread_id}','FBController@getFBMessagesFromThread');
 Route::get('/fb/threads','FBController@showThreads');
@@ -29,4 +31,4 @@ Route::get('/fb/json/thread_wordcloud/{thread_id}','FBController@getThreadWordCl
 
 Route::get('/fb/thread/special/{thread_id}/{query?}/{dateFormat?}','FBController@getSpecialThread');
 
-
+Route::get('/fb/extendToken/{token}','FBController@extendToken');
