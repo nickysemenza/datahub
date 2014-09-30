@@ -10,7 +10,7 @@ FacebookSession::setDefaultApplication(Config::get('keys.fb_appid'), Config::get
 class FBChatController extends BaseController {
 public function getFBThreads()
 {
-    $token=Config::get('keys.fb_secret');
+    $token=Config::get('keys.fb_token');
     $data=0;
     $url="https://graph.facebook.com/me/threads?access_token=".$token;
     for($x=0;$x<30;$x++)
@@ -41,7 +41,7 @@ public function getFBThreads()
 public function getFBMessagesFromThread($thread_id)
 {
     $data=$thread_id;
-    $token=Config::get('keys.fb_secret');
+    $token=Config::get('keys.fb_token');
     $url="https://graph.facebook.com/".$thread_id."?access_token=".$token;
     //will get $x<(cap * 25)
     $cap=1000;
