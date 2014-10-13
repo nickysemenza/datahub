@@ -17,11 +17,11 @@ Route::get('/', array('as' => 'home', function() {
     return View::make('test');
 }));
 Route::get('/fb/','FBChatController@showThreads');
+Route::get('/fb/threads','FBChatController@showThreads');
 
 Route::get('/fb/getThreads','FBChatController@getFBThreads');
-Route::get('/fbtest','FBChatController@fbtest');
-Route::get('/thread/{thread_id}','FBChatController@getFBMessagesFromThread');
-Route::get('/fb/threads','FBChatController@showThreads');
+Route::get('/fb/test','FBChatController@test');
+//Route::get('/thread/{thread_id}','FBChatController@getFBMessagesFromThread');
 Route::get('/fb/thread/view/{thread_id}/{limit?}','FBChatController@getThread');
 Route::get('/fb/thread/update/{thread_id}/','FBChatController@getFBMessagesFromThread');
 

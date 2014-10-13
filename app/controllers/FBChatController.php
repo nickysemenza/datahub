@@ -31,6 +31,7 @@ public function getFBThreads()
                 'participants_ids'=>implode(",", $participants_ids),
                 'participants_names'=>preg_replace('/[^a-z0-9_, ]/i', '', utf8_encode(implode(",", $participants_names))),
             );
+            var_dump($info);
             $test=Threads::firstOrCreate($info);
             $test->message_count=$eachThread['message_count'];
             $test->save();
@@ -52,8 +53,9 @@ public function getFBMessagesFromThread($thread_id)
     }
     for($x=0;$x<$cap;$x++)
     {
-        error_log("processing ".($x*25)." to ".(($x+1)*25)." of ".(($cap-1)*25)." (".(100*($x*25))/(($cap-1)*25)."%)");
+        $this->err_echo("processing ".($x*25)." to ".(($x+1)*25)." of ".(($cap-1)*25)." (".(100*($x*25))/(($cap-1)*25)."%)");
         $decoded=json_decode(file_get_contents($url), true);
+        //echo(file_get_contents($url));
         Clockwork::info($decoded);
         if($x==0)
         {
@@ -65,15 +67,33 @@ public function getFBMessagesFromThread($thread_id)
         }
         foreach($allmsg['data'] as $eachMessage)
         {
+            $otherMessageData="";
+            $datablob="";
+            //error_log(print_r($eachMessage,true));
+            if(isset($eachMessage['shares']['data'][0]['link']))
+            {
+                $otherMessageData=$eachMessage['shares']['data'][0]['link'];
+                $datablob=json_encode($eachMessage['shares']);
+            }
+            $messageText=$eachMessage['message'];
             $info=Array('from_id'=>$eachMessage['from']['id'],
             'from_name'=>$eachMessage['from']['name'],
             'time'=>$eachMessage['created_time'],
-            'message'=>$eachMessage['message'],
+            'message'=>$messageText,
+            'other'=>$otherMessageData,
+            'data'=>$datablob,
             'thread_id'=>$thread_id);
             $test=Messages::firstOrCreate($info);
         }
-        $url=$allmsg['paging']['next'];
-        var_dump($url);
+        try{
+            $url=$allmsg['paging']['next'];
+        }
+        catch(ErrorException $e)
+        {
+            error_log("Error:");
+            break;
+        }
+        error_log($url);
     }
     return View::make('test',compact('data'));
 }
@@ -92,10 +112,10 @@ public function getFBMessagesFromThread($thread_id)
         Clockwork::info(array("token"=>$token));
         var_dump($token);
     }
-    public function fbtest()
+    public function test()
     {
-        //$this->extendToken('CAAKfmL5GXZBgBAMunZB7XLhJEA22xbu7ittBhgZAgjaTsQvY6ZArncgBdj6AJjB93JuKek2jkrsULKtyaYYlhyzILKFDSZCop323h5ZC1O7DTisbpKiMkFoe19ZCz5h9mZB3ev6oacrE8yxfxeuZAKhPI9AVYs6lzwXCpPWNaKYEWSE8akI4ze3ZA54vGTmMrsHRHfqmPXVHg1MRRRioMXuDoz');
-        $data='yo';
+        $data=array();
+        $data['aa']=$this->updateNumDownloadedMessages('t_msg.a59d3107762c9a3fc773b90567d218ed51');
         return View::make('test',compact('data'));
     }
     public function showThreads()
@@ -104,11 +124,28 @@ public function getFBMessagesFromThread($thread_id)
         $threads = Threads::orderBy('message_count','DESC')->get();
         foreach($threads as $eachThread)
         {
-            array_push($threadsArray,array('message_count'=>$eachThread['message_count'],'thread_id'=>$eachThread['thread_id'],'people'=>$eachThread['participants_names']));
+            array_push($threadsArray,array(
+                'message_count'=>$eachThread['message_count'],
+                'downloaded_message_count'=>$eachThread['downloaded_message_count'],
+                'thread_id'=>$eachThread['thread_id'],
+                'people'=>$eachThread['participants_names']
+                //'downloaded_message_count'=>$this->getNumDownloadedMessages($eachThread['thread_id'])
+            ));
         }
         $data['threads']=$threadsArray;
 
         return View::make('threads',compact('data'));
+    }
+    public function updateNumDownloadedMessages($thread_id)
+    {
+
+        $count = Messages::where('thread_id', '=', $thread_id)->count();
+        $threadLookup=Threads::find($thread_id);
+        $threadLookup->downloaded_message_count=$count;
+        $threadLookup->save();
+        return $count;
+
+
     }
     public  function getThread($thread_id,$limit=50)
     {
@@ -188,29 +225,6 @@ public function getFBMessagesFromThread($thread_id)
         $data['chartname']='plotting occurance of ['.$query.'] vs time';
         $data['thread_id']=$thread_id;
         return View::make('gchart',compact('data'));
-
-//        $sortbyname=array(array('day','meggin','nicky'));
-//        foreach($frequencies as $person_name =>$value1)
-//        {
-//            echo($person_name);
-//            foreach($value1 as $day_name=>$count)
-//            {
-//                echo "Name: $person_name; Day: $day_name; Count: $count<br>";
-//                array_push($sortbyname,array($day_name,$person_name,$count));
-//            }
-//        }
-
-//        $result = array_count_values($messagesArray);
-//        ksort($result);
-//        $test=array(array('herp','derp'));
-//        foreach ($result as $key => $value) {
-//            echo "Key: $key; Value: $value<br />\n";
-//            array_push($test,array($key,$value));
-//        }
-//        echo "<pre>".var_dump($frequencies)."</pre>";
-
-
-
     }
 
     public function showThreadsJSON()
@@ -253,5 +267,22 @@ public function getFBMessagesFromThread($thread_id)
         $contents = ob_get_contents();
         ob_end_clean();
         error_log($contents);
+    }
+    public function updateEverything()
+    {
+        echo("Updating Message Count...");
+        $threads = Threads::orderBy('message_count','DESC')->get();
+        foreach($threads as $eachThread)
+        {
+            $thread_id = $eachThread['thread_id'];
+            $this->updateNumDownloadedMessages($thread_id);
+        }
+        echo("Done!");
+
+    }
+    public function err_echo($data)
+    {
+        error_log($data);
+        echo($data."\n");
     }
 }
