@@ -36,7 +36,14 @@ public function getFBThreads()
             $test->message_count=$eachThread['message_count'];
             $test->save();
         }
-        $url=$decoded['paging']['next'];
+        try{
+            $url=$decoded['paging']['next'];
+        }
+         catch(ErrorException $e)
+        {
+            error_log("Error:");
+            break;
+        }
     }
 }
 public function getFBMessagesFromThread($thread_id)
@@ -268,7 +275,7 @@ public function getFBMessagesFromThread($thread_id)
         ob_end_clean();
         error_log($contents);
     }
-    public function updateEverything()
+    public function updateMessageCount()
     {
         echo("Updating Message Count...");
         $threads = Threads::orderBy('message_count','DESC')->get();

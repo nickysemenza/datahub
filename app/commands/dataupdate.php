@@ -37,12 +37,13 @@ class dataupdate extends Command {
 	 */
 	public function fire()
 	{
+
         $controller = new FBChatController();
         //$controller->updateEverything();
         //$controller->getFBThreads();
         if(($this->option('all')) != null)
         {
-            $controller->updateEverything();
+            $controller->updateMessageCount();
         }
         if(($this->option('thread')) != null)
         {
@@ -52,12 +53,24 @@ class dataupdate extends Command {
         }
         if(($this->option('test1')) != null)
         {
-            $threads = array('t_mid.1387177795070:9d730af31f6fa7b260','t_id.380785408616428','t_mid.1376030520370:74922e8c85d2b6f516');
-                foreach($threads as $thread_id)
+
+
+            $threads = Threads::orderBy('message_count','DESC')->get();
+            foreach($threads as $eachThread)
             {
+                $thread_id = $eachThread['thread_id'];
                 echo("Now Updating Thread ".$thread_id);
                 $controller->getFBMessagesFromThread($thread_id);
             }
+
+
+
+//            $threads = array('t_mid.1387177795070:9d730af31f6fa7b260','t_id.380785408616428','t_mid.1376030520370:74922e8c85d2b6f516');
+//                foreach($threads as $thread_id)
+//            {
+//                echo("Now Updating Thread ".$thread_id);
+//                $controller->getFBMessagesFromThread($thread_id);
+//            }
 
         }
 	}
