@@ -34,6 +34,7 @@ public function getFBThreads()
             var_dump($info);
             $test=Threads::firstOrCreate($info);
             $test->message_count=$eachThread['message_count'];
+            var_dump($eachThread['message_count']);
             $test->save();
         }
         try{
@@ -51,6 +52,7 @@ public function getFBMessagesFromThread($thread_id)
     $data=$thread_id;
     $token=Config::get('keys.fb_token');
     $url="https://graph.facebook.com/".$thread_id."?access_token=".$token;
+    echo$url;
     //will get $x<(cap * 25)
     $cap=1000;
     $threadLookup=Threads::find($thread_id);
@@ -74,21 +76,32 @@ public function getFBMessagesFromThread($thread_id)
         }
         foreach($allmsg['data'] as $eachMessage)
         {
-            $otherMessageData="";
             $datablob="";
             //error_log(print_r($eachMessage,true));
-            if(isset($eachMessage['shares']['data'][0]['link']))
+            if(isset($eachMessage['shares']))
             {
-                $otherMessageData=$eachMessage['shares']['data'][0]['link'];
                 $datablob=json_encode($eachMessage['shares']);
             }
+
+            $tagData="";
+            //error_log(print_r($eachMessage,true));
+            if(isset($eachMessage['tags']))
+            {
+                $tagData=json_encode($eachMessage['tags']);
+                echo $tagData;
+            }
+
+
+
+
+
             $messageText=$eachMessage['message'];
             $info=Array('from_id'=>$eachMessage['from']['id'],
             'from_name'=>$eachMessage['from']['name'],
             'time'=>$eachMessage['created_time'],
             'message'=>$messageText,
-            'other'=>$otherMessageData,
             'data'=>$datablob,
+            'tags'=>$tagData,
             'thread_id'=>$thread_id);
             $test=Messages::firstOrCreate($info);
         }
@@ -108,15 +121,15 @@ public function getFBMessagesFromThread($thread_id)
     {
         $session = new FacebookSession($token);
         $extendedToken = (new FacebookRequest(
-            $session, 'GET', '/oauth/access_token',array(
-                'grant_type'=>'fb_exchange_token',
-                'client_id'=> Config::get('keys.fb_appid'),
-                'client_secret'=>Config::get('keys.fb_secret'),
-                'fb_exchange_token'=>$session->getToken()
+            $session, 'GET', '/oauth/access_token', array(
+                'grant_type' => 'fb_exchange_token',
+                'client_id' => Config::get('keys.fb_appid'),
+                'client_secret' => Config::get('keys.fb_secret'),
+                'fb_exchange_token' => $session->getToken()
             )
         ))->execute()->getGraphObject(GraphUser::className());
-        $token=$extendedToken->getProperty('access_token');
-        Clockwork::info(array("token"=>$token));
+        $token = $extendedToken->getProperty('access_token');
+        Clockwork::info(array("token" => $token));
         var_dump($token);
     }
     public function test()
