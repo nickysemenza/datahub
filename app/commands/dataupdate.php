@@ -41,6 +41,11 @@ class dataupdate extends Command {
         $controller = new FBChatController();
         //$controller->updateEverything();
         //$controller->getFBThreads();
+            if(($this->option('getThreads')) != null)
+        {
+            echo("hi");
+            $controller->getFBThreads();
+        }
         if(($this->option('all')) != null)
         {
             $controller->updateMessageCount();
@@ -96,6 +101,8 @@ class dataupdate extends Command {
             array('thread', null, InputOption::VALUE_OPTIONAL, 'An example option.', null),
             array('test1', null, InputOption::VALUE_OPTIONAL, 'An example option.', null),
             array('all', null, InputOption::VALUE_OPTIONAL, 'An example option.', null),
+            array('getThreads', null, InputOption::VALUE_OPTIONAL, 'An example option.', null),
+
         );
     }
 

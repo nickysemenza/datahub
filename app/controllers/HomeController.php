@@ -18,7 +18,8 @@ class HomeController extends BaseController {
 	public function showWelcome()
 	{
         Clockwork::info('ey');
-		return View::make('test');
+		$data = array("hi"=>"yo","aa"=>"bb");
+		return View::make('test',compact('data'));
 	}
 
 }
