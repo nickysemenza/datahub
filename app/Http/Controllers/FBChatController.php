@@ -1,4 +1,5 @@
 <?php namespace App\Http\Controllers;
+use DateTime;
 use Facebook\FacebookSession;
 use Facebook\FacebookRequest;
 use Facebook\GraphUser;
@@ -55,6 +56,12 @@ public function getFBThreads()
 }
 public function getFBMessagesFromThread($thread_id)
 {
+
+    print("dropping messages");
+
+    Messages::where('thread_id',$thread_id)->delete();
+
+
     $data=$thread_id;
     $token=Config::get('keys.fb_token');
     $url="https://graph.facebook.com/".$thread_id."?access_token=".$token;
@@ -93,25 +100,39 @@ public function getFBMessagesFromThread($thread_id)
             if(isset($eachMessage['tags']))
             {
                 $tagData=json_encode($eachMessage['tags']);
-                echo $tagData;
+                //echo $tagData;
+            }
+
+            $attachmentData="";
+            //error_log(print_r($eachMessage,true));
+            if(isset($eachMessage['attachments']))
+            {
+                $attachmentData=json_encode($eachMessage['attachments']);
+                //var_dump($attachmentData);
+                //echo $tagData;
             }
 
 
 
 
+            $d = DateTime::createFromFormat(DateTime::ISO8601, $eachMessage['created_time']);
 
             $messageText=$eachMessage['message'];
             $info=Array('from_id'=>$eachMessage['from']['id'],
             'from_name'=>$eachMessage['from']['name'],
-            'time'=>$eachMessage['created_time'],
+            'time_string'=>$eachMessage['created_time'],
+            'time_stamp'=>strtotime($eachMessage['created_time']),
+            'time'=>$d->format('Y-m-d H:i:s'),
             'message'=>$messageText,
-            'data'=>$datablob,
+            'data_shares'=>$datablob,
+            'data_attachments'=>$attachmentData,
             'tags'=>$tagData,
             'thread_id'=>$thread_id);
             $test=Messages::firstOrCreate($info);
         }
         try{
             $url=$allmsg['paging']['next'];
+            print($url);
         }
         catch(ErrorException $e)
         {
@@ -196,14 +217,14 @@ public function getFBMessagesFromThread($thread_id)
             $thread_id="";
         }
 
-        date_default_timezone_set('America/Los_Angeles');
+        date_default_timezone_set('America/New_York');
         $messages = Messages::where('thread_id', 'like', '%'.$thread_id.'%')->where('message','like','%'.$query.'%')->get();
         $frequencies=array();
         $dates=array();
         $names=array();
         foreach($messages as $each)
         {
-            $formattedDate=date($dateFormat, strtotime($each->time));
+            $formattedDate=date($dateFormat, strtotime($each->time_string));
             if(!in_array($formattedDate,$dates))
             {
                 array_push($dates,$formattedDate);
