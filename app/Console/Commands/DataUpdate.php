@@ -4,6 +4,7 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use App\Http\Controllers\FBChatController;
+use App\Models\Threads;
 class DataUpdate extends Command {
 
 	/**

@@ -1,5 +1,5 @@
 <?php namespace App\Http\Controllers;
-
+use App\Models\Messages;
 class HomeController extends Controller {
 
 	/*
@@ -17,9 +17,15 @@ class HomeController extends Controller {
 
 	public function showWelcome()
 	{
-        Clockwork::info('ey');
-		$data = array("hi"=>"yo","aa"=>"bb");
-		return View::make('test',compact('data'));
+		var_dump(strtotime('2014-10-01T12:49:37+0000'));
+		$messages = Messages::where('thread_id','=','t_mid.1411092543102:5cb624c43e1f3ada42')->orderBy('time_stamp', 'asc')->take(10)->get();
+		//$messages = Messages::whereNotNull('time_stamp')->->get();
+		foreach($messages as $eachMessage)
+		{
+			$arr=$eachMessage->toArray();
+			//$arr['time_real']=strtotime($arr['time']);
+			var_dump($arr);
+		}
 	}
 
 }

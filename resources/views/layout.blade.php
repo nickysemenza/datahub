@@ -16,8 +16,9 @@
 
     @section('js')
 
-    <script type="text/javascript" src="{{ URL::asset('js/bootstrap-sortable.js') }}"></script>
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+        <script type="text/javascript" src="{{ URL::asset('js/bootstrap-sortable.js') }}"></script>
     <script type="text/javascript" src="{{ URL::asset('js/bootstrap.min.js') }}"></script>
     @show
 
@@ -30,6 +31,7 @@
     <h1 id="heading">@section('append_heading')@show</h1>
     @yield('content')
 </div>
+@yield('outside_content')
 @section('bottom_js')
 @show
 </body>
