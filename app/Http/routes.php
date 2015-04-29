@@ -14,24 +14,32 @@
 Route::get('/welcome','HomeController@showWelcome');
 
 Route::get('/', array('as' => 'home', function() {
-    return View::make('test');
+    return View::make('home');
 }));
 
 
-Route::get('stickers','TestController@stickers');
-Route::get('/fb/','FBChatController@showThreads');
-Route::get('/fb/threads','FBChatController@showThreads');
-
-Route::get('/fb/getThreads','FBChatController@getFBThreads');
-Route::get('/fb/test','FBChatController@test');
-//Route::get('/thread/{thread_id}','FBChatController@getFBMessagesFromThread');
-Route::get('/fb/thread/view/{thread_id}/{limit?}','FBChatController@getThread');
-Route::get('/fb/thread/update/{thread_id}/','FBChatController@getFBMessagesFromThread');
+Route::group(['prefix' => 'fb'], function()
+{
+    Route::get('stickers','FBThreadDetailController@stickers');
+    Route::get('','FBChatController@showThreads');
+    Route::get('threads','FBChatController@showThreads');
 
 
-Route::get('/fb/json/threads','FBChatController@showThreadsJSON');
-Route::get('/fb/json/thread_wordcloud/{thread_id}','FBChatController@getThreadWordCloudJSON');
+    Route::get('thread/view/{thread_id}/{limit?}','FBThreadDetailController@getThread');
+    Route::get('thread/special/{thread_id}/{query?}/{dateFormat?}','FBThreadDetailController@getSpecialThread');
 
-Route::get('/fb/thread/special/{thread_id}/{query?}/{dateFormat?}','FBChatController@getSpecialThread');
 
-Route::get('/fb/extendToken/{token}','FBChatController@extendToken');
+
+
+    Route::get('json/threads','FBChatController@showThreadsJSON');
+    Route::get('json/thread_wordcloud/{thread_id}','FBChatController@getThreadWordCloudJSON');
+
+});
+
+
+
+
+Route::get('/fb/config/extendToken/{token}','FBChatController@extendToken');
+//old:
+//Route::get('/fb/getThreads','FBChatController@getFBThreads');
+//    Route::get('thread/update/{thread_id}/','FBChatController@getFBMessagesFromThread');

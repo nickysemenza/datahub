@@ -14,6 +14,9 @@ use App\Models\Messages;
 FacebookSession::setDefaultApplication(Config::get('keys.fb_appid'), Config::get('keys.fb_secret'));
 
 class FBChatController extends Controller {
+/**
+ * downloads all the possible threads
+ */
 public function getFBThreads()
 {
     $token=Config::get('keys.fb_token');
@@ -54,6 +57,12 @@ public function getFBThreads()
         }
     }
 }
+
+/**
+ * gets all the messages from a thread
+ * @param $thread_id
+ * @return
+ */
 public function getFBMessagesFromThread($thread_id)
 {
 
@@ -157,12 +166,6 @@ public function getFBMessagesFromThread($thread_id)
         $token = $extendedToken->getProperty('access_token');
         var_dump($token);
     }
-    public function test()
-    {
-        //$data=array();
-        //$data['aa']=$this->updateNumDownloadedMessages('t_msg.a59d3107762c9a3fc773b90567d218ed51');
-        return View::make('layout',compact('data'));
-    }
     public function showThreads()
     {
         $threadsArray=array();
@@ -192,85 +195,8 @@ public function getFBMessagesFromThread($thread_id)
 
 
     }
-    public  function getThread($thread_id,$limit=50)
-    {
-        date_default_timezone_set("America/Los_Angeles");
-        $messagesArray = Messages::where('thread_id', '=', $thread_id)->take($limit)->get();
-        $data['messages']=$messagesArray;
-        $data['thread_id']=$thread_id;
 
-        $threadLookup=Threads::find($thread_id);
-        if($threadLookup!=null)
-        {
-            $data['names']=$threadLookup->participants_names;
-        }
-        return View::make('thread',compact('data'));
-    }
-    public function getSpecialThread($thread_id,$query="",$dateFormat="Y-z")
-    {
-        if($query=="all")
-        {
-            $query="";
-        }
-        if($thread_id=="all")
-        {
-            $thread_id="";
-        }
 
-        date_default_timezone_set('America/New_York');
-        $messages = Messages::where('thread_id', 'like', '%'.$thread_id.'%')->where('message','like','%'.$query.'%')->get();
-        $frequencies=array();
-        $dates=array();
-        $names=array();
-        foreach($messages as $each)
-        {
-            $formattedDate=date($dateFormat, strtotime($each->time_string));
-            if(!in_array($formattedDate,$dates))
-            {
-                array_push($dates,$formattedDate);
-            }
-            if(!in_array($each->from_name,$names))
-            {
-                array_push($names,$each->from_name);
-            }
-
-            if(isset($frequencies[$each->from_name][$formattedDate]))
-            {
-                $frequencies[$each->from_name][$formattedDate]++;
-            }
-            else
-            {
-                $frequencies[$each->from_name][$formattedDate]=1;
-            }
-        }
-
-        sort($names);
-        $headers=$names;
-        array_unshift($headers,'dates');
-        $chartData=array($headers);
-        sort($dates);
-
-        foreach($dates as $eachDay)
-        {
-            $temp=array($eachDay);
-            foreach($names as $eachName)
-            {
-                if(isset($frequencies[$eachName][$eachDay]))
-                {
-                    array_push($temp,$frequencies[$eachName][$eachDay]);
-                }
-                else
-                {
-                    array_push($temp,0);
-                }
-            }
-            array_push($chartData,$temp);
-        }
-        $data['chartdata']=json_encode($chartData);
-        $data['chartname']='plotting occurance of ['.$query.'] vs time';
-        $data['thread_id']=$thread_id;
-        return View::make('gchart',compact('data'));
-    }
 
     public function showThreadsJSON()
     {
