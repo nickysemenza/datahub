@@ -16,6 +16,9 @@ Route::get('/welcome','HomeController@showWelcome');
 Route::get('/', array('as' => 'home', function() {
     return View::make('test');
 }));
+
+
+Route::get('stickers','TestController@stickers');
 Route::get('/fb/','FBChatController@showThreads');
 Route::get('/fb/threads','FBChatController@showThreads');
 
